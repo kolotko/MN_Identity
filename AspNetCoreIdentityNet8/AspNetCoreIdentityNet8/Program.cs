@@ -2,9 +2,7 @@ using AspNetCoreIdentityNet8.Database;
 using AspNetCoreIdentityNet8.Extensions;
 using AspNetCoreIdentityNet8.Workers;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +14,11 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<IEmailSender<User>, EmailSenderNew>();
 
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = IdentityConstants.BearerScheme;
+        options.DefaultSignInScheme = IdentityConstants.BearerScheme;
+    })
     .AddCookie(IdentityConstants.ApplicationScheme)
     .AddBearerToken(IdentityConstants.BearerScheme);
 
@@ -31,6 +33,7 @@ builder.Services.AddIdentityCore<User>(options =>
         options.Lockout.MaxFailedAccessAttempts = 3;
         options.SignIn.RequireConfirmedEmail = true;
     })
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddApiEndpoints();
 
@@ -51,7 +54,26 @@ if (app.Environment.IsDevelopment())
 }
 
 app.MapIdentityApi<User>();
+// app.CustomMapIdentityApi<User>();
+await InitialDatabese();
 
 app.Run();
 
 app.UseHttpsRedirection();
+
+async Task InitialDatabese()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var services = scope.ServiceProvider;
+        try
+        {
+            await DbInitializer.InitializeAsync(services);
+        }
+        catch (Exception ex)
+        {
+            var logger = services.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while seeding the database.");
+        }
+    }
+}
