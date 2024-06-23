@@ -13,11 +13,21 @@ builder.Services.AddSwaggerGen();
 // builder.Services.AddTransient<IEmailSender, EmailSenderOld>();
 builder.Services.AddTransient<IEmailSender<User>, EmailSenderNew>();
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireCustomClaim", policy =>
+    {
+        policy.RequireRole("Admin");
+        policy.RequireClaim("CustomClaimType", "CustomClaimValue");
+        policy.RequireClaim("CustomClaimTypeRole", "CustomClaimValueRole");
+    });
+});
+
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = IdentityConstants.BearerScheme;
         options.DefaultSignInScheme = IdentityConstants.BearerScheme;
+        options.DefaultScheme = IdentityConstants.BearerScheme;
     })
     .AddCookie(IdentityConstants.ApplicationScheme)
     .AddBearerToken(IdentityConstants.BearerScheme);
@@ -56,6 +66,9 @@ if (app.Environment.IsDevelopment())
 app.MapIdentityApi<User>();
 // app.CustomMapIdentityApi<User>();
 await InitialDatabese();
+
+app.MapGet("/protected-endpoint", () => "This endpoint does nothing.")
+    .RequireAuthorization("RequireCustomClaim");
 
 app.Run();
 
