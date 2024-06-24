@@ -70,6 +70,13 @@ await InitialDatabese();
 app.MapGet("/protected-endpoint", () => "This endpoint does nothing.")
     .RequireAuthorization("RequireCustomClaim");
 
+app.MapGet("/user-claims", (HttpContext httpContext) =>
+    {
+        var claims = httpContext.User.Claims.Select(c => new { c.Type, c.Value }).ToList();
+        return Results.Ok(claims);
+    })
+    .RequireAuthorization("RequireCustomClaim");
+
 app.Run();
 
 app.UseHttpsRedirection();
