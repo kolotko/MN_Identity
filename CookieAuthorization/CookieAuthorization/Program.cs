@@ -1,44 +1,33 @@
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authentication;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
+//jest to definicja sposobu autoryzacji, coś na zasadzie wspomnianego wczesniej dowodu i prawa ajzdy
+builder.Services.AddAuthentication("cookie")
+    .AddCookie("cookie");
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//odpowiada sekcji pisanej w middleware
+app.UseAuthentication();
+
+app.MapGet("/username", (HttpContext ctx) =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    return ctx.User.FindFirst("user").Value;
+});
 
-app.UseHttpsRedirection();
-
-var summaries = new[]
+app.MapGet("/login", async (HttpContext ctx) =>
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast")
-    .WithOpenApi();
+    // sprawdzenie danych autoryzacyjnych
+    
+    
+    // utworzenie kontekstu użytkownika
+    var claims = new List<Claim>();
+    claims.Add(new Claim("user", "Miłosz"));
+    var identity = new ClaimsIdentity(claims, "cookie");
+    await ctx.SignInAsync("cookie", new ClaimsPrincipal(identity));
+    return "ok";
+});
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}

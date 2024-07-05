@@ -10,6 +10,13 @@ builder.Services.AddScoped<AuthService>();
 var app = builder.Build();
 app.Use(async (ctx, next) =>
 {
+    var endpoint = ctx.GetEndpoint();
+
+    if (endpoint is not null && endpoint.DisplayName.Contains("login"))
+    {
+        await next.Invoke();
+    }
+
     var idp = ctx.RequestServices.GetRequiredService<IDataProtectionProvider>();
     var protector = idp.CreateProtector("auth-cookie");
     var authCookie = ctx.Request.Headers.Cookie.FirstOrDefault();
