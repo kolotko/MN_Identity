@@ -41,7 +41,7 @@ builder.Services.AddIdentityCore<User>(options =>
         options.Password.RequireLowercase = true;
 
         options.Lockout.MaxFailedAccessAttempts = 3;
-        options.SignIn.RequireConfirmedEmail = true;
+        // options.SignIn.RequireConfirmedEmail = true;
     })
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
