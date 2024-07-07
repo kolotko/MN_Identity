@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookieAuthorization", "Cook
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CustomCookieAuthorization", "CustomCookieAuthorization\CustomCookieAuthorization.csproj", "{B2F3972D-208D-463E-A8C6-220A07E21B47}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CookieAutorizationImplementation", "CookieAutorizationImplementation\CookieAutorizationImplementation.csproj", "{D784BAF2-8BCD-4644-AC98-8080C95DB61B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{B2F3972D-208D-463E-A8C6-220A07E21B47}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2F3972D-208D-463E-A8C6-220A07E21B47}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2F3972D-208D-463E-A8C6-220A07E21B47}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D784BAF2-8BCD-4644-AC98-8080C95DB61B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D784BAF2-8BCD-4644-AC98-8080C95DB61B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D784BAF2-8BCD-4644-AC98-8080C95DB61B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D784BAF2-8BCD-4644-AC98-8080C95DB61B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
