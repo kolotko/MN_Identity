@@ -1,0 +1,22 @@
+﻿@inject NavigationManager _navigationManager
+@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<div>
+    <button @onclick="Login">Login</button>
+</div>
+<AuthorizeView>
+    <p>Id użytkownika: @context.User.FindFirst("id")?.Value</p>
+</AuthorizeView>
+
+
+@code {
+    
+    [Inject] CookieAuthenticationStateProvider CookieAuth{ get; set; }
+
+    public async Task Login()
+    {
+        await CookieAuth.Login();
+    }
+}
