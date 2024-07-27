@@ -12,8 +12,6 @@ app.UseStaticFiles();
 
 var api = app.MapGroup("api");
 
-api.MapGet("/", () => "Hello World!");
-
 api.MapPost("/login", () => Results.SignIn(
     new ClaimsPrincipal(new ClaimsIdentity(
             new []
