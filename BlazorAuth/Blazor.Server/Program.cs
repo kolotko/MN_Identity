@@ -34,6 +34,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidAudience = "your-audience",
             ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(secretKey))
         };
@@ -42,13 +43,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 builder.Services.AddAuthorization();
 
 var app = builder.Build();
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
+var api = app.MapGroup("api");
 
-// Enable authentication and authorization middleware
-app.UseAuthentication();
-app.UseAuthorization();
 
 // Endpoint to generate the JWT with encrypted payload
-app.MapPost("/generate-token", (HttpContext context) =>
+api.MapPost("/generate-token", (HttpContext context) =>
 {
     // Define payload
     var payload = new
@@ -62,11 +63,12 @@ app.MapPost("/generate-token", (HttpContext context) =>
     // Create JWT token
     var tokenHandler = new JwtSecurityTokenHandler();
     var key = Encoding.ASCII.GetBytes(secretKey);
+    Console.WriteLine(DateTime.UtcNow.AddSeconds(1));
     var tokenDescriptor = new SecurityTokenDescriptor
     {
         Issuer = "your-issuer",
         Audience = "your-audience",
-        Expires = DateTime.UtcNow.AddHours(1),
+        Expires = DateTime.UtcNow.AddSeconds(1),
         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
         Claims = new Dictionary<string, object>
         {
@@ -81,7 +83,7 @@ app.MapPost("/generate-token", (HttpContext context) =>
 });
 
 // Secure endpoint that requires a valid JWT
-app.MapGet("/secure-endpoint", (ClaimsPrincipal user) =>
+api.MapGet("/secure-endpoint", (ClaimsPrincipal user) =>
 {
     var encryptedPayload = user.FindFirst("data")?.Value;
     if (encryptedPayload == null)
@@ -99,7 +101,7 @@ app.MapGet("/secure-endpoint", (ClaimsPrincipal user) =>
 }).RequireAuthorization();
 
 
-// Run the application
+app.MapFallbackToFile("index.html");
 app.Run();
 
 // Define helper methods for encryption and decryption

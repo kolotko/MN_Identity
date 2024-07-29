@@ -1,0 +1,43 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<div>
+    <button @onclick="LogOut">Wyloguj</button>
+</div>
+
+<div>
+    <button @onclick="Login">Login</button>
+</div>
+
+
+<AuthorizeView>
+    <p>Id użytkownika: @context.User.FindFirst("id")?.Value</p>
+</AuthorizeView>
+
+<div>
+    <button @onclick="ExampleSecurityEndPoint">użycie Refresh tokenu (ważnośc zwykłego tokenu to 1s)</button>
+</div>
+Odpowiedź z api: @testString
+
+@code {
+
+    [Inject] TokenAuthenticationStateProvider tokenAuth{ get; set; }
+    [Inject] TestService testService{ get; set; }
+    private string testString = "";
+
+    public async Task Login()
+    {
+        await tokenAuth.Login();
+    }
+    
+    public void LogOut()
+    {
+        tokenAuth.LogOut();
+    }
+    
+     public async Task ExampleSecurityEndPoint()
+    {
+        testString = await testService.ExampleCall();
+    }
+}
